@@ -218,6 +218,9 @@ int main(int argc, char** argv) {
 
                     // Draw text
                     putText(image, result->getText()->getText(), toCvPoint(result->getResultPoints()[0]), FONT_HERSHEY_PLAIN, 1, Scalar( 110, 220, 0 ));
+                    //show result
+                    imshow("result",image);
+		    cout<< result->getText()->getText() <<endl;
 
                 }
 
