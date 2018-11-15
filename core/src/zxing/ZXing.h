@@ -37,9 +37,10 @@ typedef bool boolean;
 
 #include <limits>
 
-#if defined(_WIN32) || defined(_WIN64)
-
+#if (defined(_WIN32) || defined(_WIN64) )&& (not defined (__MINGW32__))
+#include <math.h> 
 #include <float.h>
+
 
 namespace zxing {
 inline bool isnan(float v) {return _isnan(v) != 0;}
