@@ -56,14 +56,19 @@ endif()
 
 include_directories(core/src)
 add_library(libzxing ${LIBZXING_FILES})
+add_library(zxing SHARED ${LIBZXING_FILES})
 set_target_properties(libzxing PROPERTIES PREFIX "")
+set_target_properties(zxing PROPERTIES PREFIX "")
 
 find_package(Iconv)
 if(ICONV_FOUND)
     include_directories(${ICONV_INCLUDE_DIR})
-    target_link_libraries(libzxing ${ICONV_LIBRARIES})
+	target_link_libraries(zxing ${OpenCV_LIBRARIES} ${ICONV_LIBRARIES})
+    target_link_libraries(libzxing ${OpenCV_LIBRARIES} ${ICONV_LIBRARIES})
 else()
     add_definitions(-DNO_ICONV=1)
+	target_link_libraries(zxing ${OpenCV_LIBRARIES})
+    target_link_libraries(libzxing ${OpenCV_LIBRARIES})
 endif()
 
 # Add OpenCV cli executable
@@ -73,7 +78,11 @@ if(OpenCV_FOUND)
         "./opencv-cli/src/*.h"
     )
     add_executable(zxing-cv ${OPENCV_ZXING_FILES})
-    target_link_libraries(zxing-cv libzxing ${OpenCV_LIBRARIES})
+	if(ICONV_FOUND)
+    target_link_libraries(zxing-cv libzxing ${OpenCV_LIBRARIES} ${ICONV_LIBRARIES})
+	else()
+	target_link_libraries(zxing-cv libzxing ${OpenCV_LIBRARIES})
+	endif()
 endif()
 
 # Add cli executable.
@@ -82,10 +91,14 @@ file(GLOB_RECURSE ZXING_FILES
     "./cli/src/*.h"
 )
 
-add_executable(zxing ${ZXING_FILES})
-target_link_libraries(zxing libzxing)
+add_executable(zxing-pic ${ZXING_FILES} )
+if(ICONV_FOUND)
+target_link_libraries(zxing-pic libzxing ${ICONV_LIBRARIES})
+else()
+target_link_libraries(zxing-pic libzxing)
+endif()
 
-install(TARGETS zxing libzxing EXPORT zxing-targets
+install(TARGETS zxing zxing-cv zxing-pic libzxing EXPORT zxing-targets
 	LIBRARY DESTINATION lib
 	RUNTIME DESTINATION bin
 	ARCHIVE DESTINATION lib
